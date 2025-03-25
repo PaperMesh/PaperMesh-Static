@@ -1,202 +1,70 @@
-// Chatbot Script Loader and Initializer
-(function() {
-    // Check if chatbot is already initialized
-    if (window.chatbotInitialized) return;
-    window.chatbotInitialized = true;
+(function () {
+    if (document.getElementById("chat-container")) return;
 
-    // Ensure the script runs after the DOM is fully loaded
-    function initializeChatbot() {
-        // Create Chatbot Container
-        function createChatbotContainer() {
-            // Check if container already exists
-            if (document.getElementById('custom-chatbot-container')) return;
+    // Create chat container
+    let chatContainer = document.createElement("div");
+    chatContainer.id = "chat-container";
+    chatContainer.style.position = "fixed";
+    chatContainer.style.bottom = "80px";
+    chatContainer.style.right = "20px";
+    chatContainer.style.width = "300px";
+    chatContainer.style.height = "400px";
+    chatContainer.style.backgroundColor = "white";
+    chatContainer.style.border = "1px solid #ccc";
+    chatContainer.style.borderRadius = "10px";
+    chatContainer.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+    chatContainer.style.overflow = "hidden";
+    chatContainer.style.display = "flex";
+    chatContainer.style.flexDirection = "column";
+    chatContainer.style.fontFamily = "Arial, sans-serif";
 
-            // Main chatbot container
-            const chatbotContainer = document.createElement('div');
-            chatbotContainer.id = 'custom-chatbot-container';
-            chatbotContainer.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                width: 350px;
-                border: 1px solid #e0e0e0;
-                background: white;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                border-radius: 8px;
-                overflow: hidden;
-                display: none;
-                z-index: 1000;
-            `;
+    // Chat messages
+    let chatMessages = document.createElement("div");
+    chatMessages.id = "chat-messages";
+    chatMessages.style.flex = "1";
+    chatMessages.style.padding = "10px";
+    chatMessages.style.overflowY = "auto";
 
-            // Chatbot content
-            chatbotContainer.innerHTML = `
-                <div style="
-                    background: #f0f0f0;
-                    padding: 10px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                ">
-                    <span>Customer Support</span>
-                    <button id="chatbot-close-btn" style="
-                        background: none;
-                        border: none;
-                        font-size: 20px;
-                        cursor: pointer;
-                    ">×</button>
-                </div>
-                <div id="chatbot-messages" style="
-                    height: 400px;
-                    overflow-y: auto;
-                    padding: 10px;
-                    background: #f9f9f9;
-                "></div>
-                <div style="
-                    display: flex;
-                    padding: 10px;
-                    border-top: 1px solid #e0e0e0;
-                ">
-                    <input type="text" id="chatbot-input" placeholder="Type your message..." style="
-                        flex-grow: 1;
-                        padding: 8px;
-                        border: 1px solid #d0d0d0;
-                        border-radius: 4px;
-                        margin-right: 10px;
-                    ">
-                    <button id="chatbot-send" style="
-                        padding: 8px 15px;
-                        background: #4CAF50;
-                        color: white;
-                        border: none;
-                        border-radius: 4px;
-                    ">Send</button>
-                </div>
-            `;
+    // Input field
+    let chatInput = document.createElement("input");
+    chatInput.id = "chat-input";
+    chatInput.placeholder = "Type a message...";
+    chatInput.style.width = "100%";
+    chatInput.style.border = "none";
+    chatInput.style.padding = "10px";
+    chatInput.style.boxSizing = "border-box";
 
-            document.body.appendChild(chatbotContainer);
-            return chatbotContainer;
-        }
-
-        // Create Chatbot Toggle Button
-        function createChatbotToggleButton() {
-            // Check if toggle button already exists
-            if (document.getElementById('chatbot-toggle-container')) return;
-
-            const buttonContainer = document.createElement('div');
-            buttonContainer.id = 'chatbot-toggle-container';
-            buttonContainer.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 1001;
-            `;
-
-            const toggleButton = document.createElement('button');
-            toggleButton.id = 'chatbot-toggle-btn';
-            toggleButton.style.cssText = `
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 60px;
-                height: 60px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                cursor: pointer;
-                transition: transform 0.2s, background-color 0.2s;
-            `;
-
-            // SVG Icon for chat
-            toggleButton.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                </svg>
-            `;
-
-            // Toggle chatbot visibility
-            toggleButton.addEventListener('click', () => {
-                const chatbotContainer = document.getElementById('custom-chatbot-container');
-                if (chatbotContainer) {
-                    chatbotContainer.style.display = 
-                        chatbotContainer.style.display === 'none' ? 'block' : 'none';
-                }
-            });
-
-            buttonContainer.appendChild(toggleButton);
-            document.body.appendChild(buttonContainer);
-        }
-
-        // Chatbot Interaction Logic
-        function setupChatbotInteractions() {
-            const chatbotContainer = document.getElementById('custom-chatbot-container');
-            const closeBtn = document.getElementById('chatbot-close-btn');
-            const sendBtn = document.getElementById('chatbot-send');
-            const inputField = document.getElementById('chatbot-input');
-            const messagesContainer = document.getElementById('chatbot-messages');
-
-            // Prevent multiple event listeners
-            if (closeBtn.getAttribute('data-listener-added')) return;
-
-            // Close button functionality
-            closeBtn.addEventListener('click', () => {
-                chatbotContainer.style.display = 'none';
-            });
-            closeBtn.setAttribute('data-listener-added', 'true');
-
-            // Send message functionality
-            function sendMessage() {
-                const message = inputField.value.trim();
-                if (!message) return;
-
-                // Add user message
-                const userMessageEl = document.createElement('div');
-                userMessageEl.style.marginBottom = '10px';
-                userMessageEl.innerHTML = `<strong style="color: #007bff;">You:</strong> ${message}`;
-                messagesContainer.appendChild(userMessageEl);
-
-                // Clear input
-                inputField.value = '';
-
-                // Simulate bot response (replace with your actual logic)
-                const botMessageEl = document.createElement('div');
-                botMessageEl.style.marginBottom = '10px';
-                botMessageEl.innerHTML = `<strong style="color: #28a745;">Support:</strong> Thank you for your message. Our team will get back to you shortly.`;
-                messagesContainer.appendChild(botMessageEl);
-
-                // Scroll to bottom
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    chatInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            let userMessage = chatInput.value.trim();
+            if (userMessage) {
+                addMessage("You", userMessage);
+                chatInput.value = "";
+                botResponse(userMessage);
             }
-
-            // Send on button click
-            sendBtn.addEventListener('click', sendMessage);
-
-            // Send on Enter key
-            inputField.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
         }
+    });
 
-        // Initialize all components
-        createChatbotContainer();
-        createChatbotToggleButton();
-        setupChatbotInteractions();
+    // Append elements
+    chatContainer.appendChild(chatMessages);
+    chatContainer.appendChild(chatInput);
+    document.body.appendChild(chatContainer);
+
+    function addMessage(sender, message) {
+        let messageDiv = document.createElement("div");
+        messageDiv.textContent = `${sender}: ${message}`;
+        messageDiv.style.marginBottom = "5px";
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Ensure the script runs after DOM is loaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeChatbot);
-    } else {
-        initializeChatbot();
+    function botResponse(userMessage) {
+        let response;
+        if (userMessage.toLowerCase().includes("hello")) {
+            response = "Hi there! How can I help you?";
+        } else {
+            response = "I'm just a simple chatbot. Try saying 'hello'.";
+        }
+        setTimeout(() => addMessage("Bot", response), 500);
     }
 })();
-
-// Expose global toggle function
-window.toggleChatbot = function() {
-    const chatbotContainer = document.getElementById('custom-chatbot-container');
-    if (chatbotContainer) {
-        chatbotContainer.style.display = 
-            chatbotContainer.style.display === 'none' ? 'block' : 'none';
-    }
-};
