@@ -1,9 +1,16 @@
 // Chatbot Script Loader and Initializer
 (function() {
+    // Check if chatbot is already initialized
+    if (window.chatbotInitialized) return;
+    window.chatbotInitialized = true;
+
     // Ensure the script runs after the DOM is fully loaded
     function initializeChatbot() {
         // Create Chatbot Container
         function createChatbotContainer() {
+            // Check if container already exists
+            if (document.getElementById('custom-chatbot-container')) return;
+
             // Main chatbot container
             const chatbotContainer = document.createElement('div');
             chatbotContainer.id = 'custom-chatbot-container';
@@ -30,7 +37,7 @@
                     justify-content: space-between;
                     align-items: center;
                 ">
-                    <span>User Assistant</span>
+                    <span>Customer Support</span>
                     <button id="chatbot-close-btn" style="
                         background: none;
                         border: none;
@@ -42,6 +49,7 @@
                     height: 400px;
                     overflow-y: auto;
                     padding: 10px;
+                    background: #f9f9f9;
                 "></div>
                 <div style="
                     display: flex;
@@ -71,6 +79,9 @@
 
         // Create Chatbot Toggle Button
         function createChatbotToggleButton() {
+            // Check if toggle button already exists
+            if (document.getElementById('chatbot-toggle-container')) return;
+
             const buttonContainer = document.createElement('div');
             buttonContainer.id = 'chatbot-toggle-container';
             buttonContainer.style.cssText = `
@@ -107,8 +118,10 @@
             // Toggle chatbot visibility
             toggleButton.addEventListener('click', () => {
                 const chatbotContainer = document.getElementById('custom-chatbot-container');
-                chatbotContainer.style.display = 
-                    chatbotContainer.style.display === 'none' ? 'block' : 'none';
+                if (chatbotContainer) {
+                    chatbotContainer.style.display = 
+                        chatbotContainer.style.display === 'none' ? 'block' : 'none';
+                }
             });
 
             buttonContainer.appendChild(toggleButton);
@@ -123,10 +136,14 @@
             const inputField = document.getElementById('chatbot-input');
             const messagesContainer = document.getElementById('chatbot-messages');
 
+            // Prevent multiple event listeners
+            if (closeBtn.getAttribute('data-listener-added')) return;
+
             // Close button functionality
             closeBtn.addEventListener('click', () => {
                 chatbotContainer.style.display = 'none';
             });
+            closeBtn.setAttribute('data-listener-added', 'true');
 
             // Send message functionality
             function sendMessage() {
@@ -135,7 +152,8 @@
 
                 // Add user message
                 const userMessageEl = document.createElement('div');
-                userMessageEl.innerHTML = `<strong>You:</strong> ${message}`;
+                userMessageEl.style.marginBottom = '10px';
+                userMessageEl.innerHTML = `<strong style="color: #007bff;">You:</strong> ${message}`;
                 messagesContainer.appendChild(userMessageEl);
 
                 // Clear input
@@ -143,7 +161,8 @@
 
                 // Simulate bot response (replace with your actual logic)
                 const botMessageEl = document.createElement('div');
-                botMessageEl.innerHTML = `<strong>Bot:</strong> I received your message: "${message}"`;
+                botMessageEl.style.marginBottom = '10px';
+                botMessageEl.innerHTML = `<strong style="color: #28a745;">Support:</strong> Thank you for your message. Our team will get back to you shortly.`;
                 messagesContainer.appendChild(botMessageEl);
 
                 // Scroll to bottom
